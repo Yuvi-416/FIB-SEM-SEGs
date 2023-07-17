@@ -17,7 +17,7 @@ from engine import train_one_epoch, evaluate
 from plot_curve import plot_loss_and_lr, plot_map
 from torchvision.models.detection.mask_rcnn import MaskRCNNPredictor
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
-from src.Custom_datas import platelet_pt, MitoDataset, UroMitoDataset
+from src.Custom_datas import UroMitoDataset
 from natsort import natsorted
 from sklearn.metrics import average_precision_score, precision_score, recall_score, f1_score, confusion_matrix
 
