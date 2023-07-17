@@ -25,11 +25,10 @@ class UroMitoDataset(torch.utils.data.Dataset):
 
         # Convert the binary mask to non-binary and assign labels
         img_labels, num_objs = label(mask)
-        # im = Image.fromarray(labels)
-        # im.show()
 
         # instances are encoded as different colors
         obj_ids = np.unique(img_labels)
+        
         # first id is the background, so remove it
         obj_ids = obj_ids[1:]
 
@@ -53,11 +52,7 @@ class UroMitoDataset(torch.utils.data.Dataset):
         boxes = torch.as_tensor(boxes, dtype=torch.float32)
         masks = torch.as_tensor(masks, dtype=torch.uint8)
 
-        # labels = torch.arange(1, num_objs + 1, dtype=torch.int64)
         labels = torch.ones((num_objs,), dtype=torch.int64)
-
-        # print("labels:", labels)
-        # print("labels:", len(labels))
 
         image_id = torch.tensor([idx])
         area = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0])
