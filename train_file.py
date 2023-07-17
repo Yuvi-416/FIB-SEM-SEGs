@@ -102,8 +102,8 @@ def compute_dice_coefficient(gt_annotations, pred_results):
 
 
 # UROSCELL MitoDataset
-dataset_UROmito = UroMitoDataset("...", get_transform(train=True))
-dataset_UROmito_test = UroMitoDataset("...",get_transform(train=False))
+dataset_UROmito = UroMitoDataset("...", get_transform(train=True)) # change the "..." to the train image path
+dataset_UROmito_test = UroMitoDataset("...",get_transform(train=False)) # change the "..." to the test image path
 
 
 # define training and validation data loaders
@@ -136,7 +136,7 @@ learning_rate = []
 val_map = []
 
 num_epochs = 100
-'''
+#'''
 for epoch in range(num_epochs):
     # train for one epoch, printing every 10 iterations
     metric_logger = train_one_epoch(model, optimizer, data_loader_train, device, epoch, print_freq=10)
@@ -165,20 +165,21 @@ for epoch in range(num_epochs):
     # if epoch % 1 == 0:
     #     torch.save(model.state_dict(), str(epoch) + ".pt")
 
-torch.save(model.state_dict(), f'_{num_epochs}.pt')
-'''
+# Save the trained model
+torch.save(model.state_dict(), f'UroCell_{num_epochs}.pt') 
+#'''
 
 
 ###################################################################
-#'''
+'''
 ############################
 # Load the trained model
 model.load_state_dict(torch.load(
-    f'_{num_epochs}.pt'))
+    f'UroCell__{num_epochs}.pt'))
 model.eval()
-#'''
+'''
 
-#'''
+'''
 # # Inference
 # pick one image from the test set
 img, gtt = dataset_mito_test[89]
@@ -283,3 +284,4 @@ dice_coefficient, jaccard_foreground, jaccard_background, Voc_score, accuracy, p
 print("dice_coefficient:", dice_coefficient, "jaccard_foreground:", jaccard_foreground, "jaccard_background:", jaccard_background, "Voc_score:", Voc_score, "accuracy:", accuracy, "precision:", precision, "recall:", recall)
 
 print("mAP:", mAP, "precision:", "f1:", f1)
+'''
