@@ -1,10 +1,14 @@
-# FIB-SEM-SEGs
-In this repository, we have used the Mask R-CNN model to detect and segment the mitochondrial region of interest from the UroCell dataset. Here, we used the maskrcnn_resnet50_fpn backbone while building the Mask R-CNN network. The user can change to another pre-trained network if they want.
+# Robust Ensemble Approach to Automatic Segmentation of Mitochondria from FIB-SEM Images
 
-Please use train_file.py to train the model with your own data, and within the same file, we also provide a way to test the testing data.
-The data which we have used can be downloaded from: https://github.com/MancaZerovnikMekuc/UroCell
+In this repository, we have employed the Mask R-CNN model to detect and segment the mitochondrial region of interest from the UroCell dataset. We utilized the `maskrcnn_resnet50_fpn` backbone for building the Mask R-CNN network, but users can easily switch to another pre-trained network if desired.
 
-# Obtained result:
+## Training and Testing
+
+To train your own model with custom data, please use `train_file.py`. This file also provides a convenient way to test your data. You can download the UroCell dataset from (https://github.com/MancaZerovnikMekuc/UroCell).
+
+For our 3D segmentation work, we employed the PyTorch 3D U-Net model available at (https://github.com/wolny/pytorch-3dunet). We've provided a config YAML file for both training and testing. Before using it, ensure that you've installed the `pytorch-3dunet` package on your workstation.
+
+## Results with MASK R-CNN
 
 ![test_fib1-2-3-2_obj_0](https://github.com/Yuvi-416/FIB-SEM-SEGs/assets/65744819/6e064ce0-7ef8-4fac-b9f9-9d2aa54fcb1c)
 ![valid_pred_image](https://github.com/Yuvi-416/FIB-SEM-SEGs/assets/65744819/8a85daac-f902-40a9-9abf-888490f9286c)
