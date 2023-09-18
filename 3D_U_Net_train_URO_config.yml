@@ -1,0 +1,160 @@
+# Training config file
+model:
+  name: UNet3D
+  # number of input channels to the model
+  in_channels: 1
+  # number of output channels
+  out_channels: 1
+  # determines the order of operators in a single layer (crg - Conv3d+ReLU+GroupNorm)
+  layer_order: gcr
+  # initial number of feature maps
+  f_maps: [32, 64, 128, 256]
+  # number of groups in the groupnorm
+  num_groups: 8
+  # apply element-wise nn.Sigmoid after the final 1x1x1 convolution, otherwise apply nn.Softmax
+  final_sigmoid: true
+  # if True applies the final normalization layer (sigmoid or softmax), otherwise the networks returns the output from the final convolution layer; use False for regression problems, e.g. de-noising
+  is_segmentation: true
+
+# loss function to be used during training
+loss:
+  name: BCEWithLogitsLoss # BCEWithLogitsLoss, BCEDiceLoss
+  # skip the last channel in the target (i.e. when last channel contains data not relevant for the loss)
+  skip_last_target: true
+
+optimizer:
+  # initial learning rate
+  learning_rate: 0.0002
+  # weight decay
+  weight_decay: 0.00001
+
+# evaluation metric
+eval_metric:
+  # use average precision metric
+  name: BlobsAveragePrecision
+  # values on which the nuclei probability maps will be thresholded for AP computation
+  thresholds: [0.4, 0.5, 0.6, 0.7, 0.8]
+  metric: 'ap'
+
+lr_scheduler:
+  # reduce learning rate when evaluation metric plateaus
+  name: ReduceLROnPlateau
+  # use 'max' if eval_score_higher_is_better=True, 'min' otherwise
+  mode: max
+  # factor by which learning rate will be reduced
+  factor: 0.2
+  # number of *validation runs* with no improvement after which learning rate will be reduced
+  patience: 8
+
+trainer:
+  # model with lower eval score is considered better
+  eval_score_higher_is_better: True
+  # path to the checkpoint directory
+  checkpoint_dir: /home/yuvi/Desktop/DATASETS_OUTPUTS/Task_3/pytorch_faster_rcnn_stuff/Uroscell/NEW/checkpoint
+  # path to latest checkpoint; if provided the training will be resumed from that checkpoint
+  resume: null
+  # path to the best_checkpoint.pytorch; to be used for fine-tuning the model with additional ground truth
+  pre_trained: null # /home/yuvi/Desktop/DATASETS_OUTPUTS/Task_3/pytorch_faster_rcnn_stuff/Uroscell/NEW/pre-trained_model/best_checkpoint.pytorch
+  # how many iterations between validations
+  validate_after_iters: 100
+  # how many iterations between tensorboard logging
+  log_after_iters: 50
+  # max number of epochs
+  max_num_epochs: 100
+  # max number of iterations
+  max_num_iterations: 1500
+
+# Configure training and validation loaders
+loaders:
+  dataset: StandardHDF5Dataset
+  batch_size: 1
+  # how many subprocesses to use for data loading
+  num_workers: 1
+  # path to the raw data within the H5
+  raw_internal_path: /raw
+  # path to the the label data withtin the H5
+  label_internal_path: /label
+  # path to the pixel-wise weight map withing the H5 if present
+  weight_internal_path: null
+  # configuration of the train loader
+  train:
+    # path to the training datasets
+    file_paths:
+      - - /..../train_h5 # Pass the training file in .h5
+
+    # SliceBuilder configuration, i.e. how to iterate over the input volume patch-by-patch
+    slice_builder:
+      name: FilterSliceBuilder
+      # train patch size given to the network (adapt to fit in your GPU mem, generally the bigger patch the better)
+      patch_shape: [64, 64, 64]
+      # train stride between patches
+      stride_shape: [20, 40, 40]
+      # minimum volume of the labels in the patch
+      threshold: 0.01
+      # probability of accepting patches which do not fulfil the threshold criterion
+      slack_acceptance: 0.01
+
+    transformer:
+      raw:
+        - name: Standardize
+        - name: RandomFlip
+        - name: RandomRotate90
+        - name: RandomRotate
+          # rotate only in ZY plane due to anisotropy
+          axes: [[2, 1]]
+          angle_spectrum: 30
+          mode: reflect
+        - name: ElasticDeformation
+          spline_order: 3
+        - name: ToTensor
+          expand_dims: true
+      label:
+        - name: RandomFlip
+        - name: RandomRotate90
+        - name: RandomRotate
+          # rotate only in ZY plane due to anisotropy
+          axes: [[2, 1]]
+          angle_spectrum: 30
+          mode: reflect
+        - name: ElasticDeformation
+          spline_order: 0
+          # convert target volume to binary mask
+        - name: BlobsToMask
+          # append ground truth labels in the last channel of the target for evaluation metric computation
+          append_label: true
+          # if 'true' appends boundary mask as a 2nd channel of the target; boundaries are computed using the 'find_boundaries()' function from skimage
+          # learning the boundaries as a 2nd objective sometimes helps with the nuclei mask prediction
+          boundary: false
+        - name: ToTensor
+          expand_dims: false
+
+  # configuration of the val loader
+  val:
+    # path to the val datasets
+    file_paths:
+      - /..../valid_h5 # Pass the validaion file in .h5
+
+    # SliceBuilder configuration, i.e. how to iterate over the input volume patch-by-patch
+    slice_builder:
+      name: FilterSliceBuilder
+      # train patch size given to the network (adapt to fit in your GPU mem, generally the bigger patch the better)
+      patch_shape: [64, 64, 64]
+      # train stride between patches
+      stride_shape: [64, 64, 64]
+      # minimum volume of the labels in the patch
+      threshold: 0.01
+      # probability of accepting patches which do not fulfil the threshold criterion
+      slack_acceptance: 0.01
+
+    # data augmentation
+    transformer:
+      raw:
+        - name: Standardize
+        - name: ToTensor
+          expand_dims: true
+      label:
+        - name: BlobsToMask
+          append_label: true
+          boundary: false
+        - name: ToTensor
+          expand_dims: false
