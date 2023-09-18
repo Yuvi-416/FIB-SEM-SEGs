@@ -103,6 +103,7 @@ def compute_dice_coefficient(gt_annotations, pred_results):
 
 # UROSCELL MitoDataset
 dataset_UROmito = UroMitoDataset("...", get_transform(train=True)) # change the "..." to the train image path
+dataset_UROmito_valid = UroMitoDataset("...",get_transform(train=False)) # change the "..." to the valid image path
 dataset_UROmito_test = UroMitoDataset("...",get_transform(train=False)) # change the "..." to the test image path
 
 
@@ -110,7 +111,7 @@ dataset_UROmito_test = UroMitoDataset("...",get_transform(train=False)) # change
 data_loader_train = torch.utils.data.DataLoader(dataset_UROmito, batch_size=2, shuffle=True, num_workers=0,
                                                 collate_fn=collate_fn)
 
-data_loader_valid = torch.utils.data.DataLoader(dataset_UROmito_test, batch_size=1, shuffle=False,
+data_loader_valid = torch.utils.data.DataLoader(dataset_UROmito_valid, batch_size=1, shuffle=False,
                                                 num_workers=0,
                                                 collate_fn=collate_fn)
 
