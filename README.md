@@ -8,6 +8,8 @@ To train your own model with custom data, please use `train_file.py`. This file 
 
 For our 3D segmentation work, we employed the PyTorch 3D U-Net model available at (https://github.com/wolny/pytorch-3dunet). We've provided a config YAML file for both training and testing. Before using it, ensure that you've installed the `pytorch-3dunet` package on your workstation.
 
+- The ensemble_fusion.py file can be used to fuse the prediction output of two models.
+
 ## Results with MASK R-CNN:
 | Test Image 1 | Valid Pred Image |
 | --- | --- |
