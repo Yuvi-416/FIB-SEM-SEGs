@@ -2,6 +2,12 @@
 
 In this repository, we have employed the Mask R-CNN model to detect and segment the mitochondrial region of interest from the UroCell dataset. We utilized the `maskrcnn_resnet50_fpn` backbone for building the Mask R-CNN network, but users can easily switch to another pre-trained network if desired.
 
+Link of the datasets used in this study:
+- https://www.epfl.ch/labs/cvlab/data/data-em/ (Lucchi (dataset-1))
+- https://sites.google.com/view/connectomics (Lucchi++ (dataset-2))
+- https://sites.google.com/view/connectomics (Kasthuri++ (dataset-3))
+- https://github.com/MancaZerovnikMekuc/UroCell (UroCell (dataset-4))
+
 ## Training and Testing
 
 To train your own model with custom data, please use `train_file.py`. This file also provides a convenient way to test your data. You can download the UroCell dataset from (https://github.com/MancaZerovnikMekuc/UroCell).
